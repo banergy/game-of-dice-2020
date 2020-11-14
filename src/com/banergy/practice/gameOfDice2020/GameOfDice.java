@@ -17,6 +17,8 @@ public abstract class GameOfDice
 	abstract public void setNumPlayers(int numPlayers);
 	abstract public void setScoreTarget(int scoreTarget);
 	
+	abstract public int rollDice();
+	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
 	}

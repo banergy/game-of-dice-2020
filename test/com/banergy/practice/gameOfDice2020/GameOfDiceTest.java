@@ -47,7 +47,7 @@ public class GameOfDiceTest
 			for(int round = 0; round < 10; round++) {
 				GameOfDice game = GameOfDice.newInstance(seed + retries);
 				for(int roll = 0; roll < 10; roll++) {
-					int face = 0;//TODO game.rollDice();
+					int face = game.rollDice();
 					timesEachFaceAppearsPerRoll[face][roll]++;
 				}
 			}
@@ -71,7 +71,7 @@ public class GameOfDiceTest
 		int[] faceCounts = new int[7];
 		for(int pass = 0; pass < 5; pass++) {
 			for(int roll = 0; roll < 600; roll++) {
-				// TODO faceCounts[game.rollDice()]++;
+				faceCounts[game.rollDice()]++;
 			}
 			for(int face = 1; face <= 6; face++) {
 				int count = faceCounts[face];
