@@ -70,15 +70,16 @@ public class GameOfDiceTest
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
 		GameOfDice game = GameOfDice.newInstance(seed);
-		int[] faceCounts = new int[7];
 		for(int pass = 0; pass < 5; pass++) {
+			int[] faceCounts = new int[7];
 			for(int roll = 0; roll < 600; roll++) {
 				faceCounts[game.rollDice()]++;
 			}
+			System.out.println(Arrays.toString(faceCounts));
 			for(int face = 1; face <= 6; face++) {
 				int count = faceCounts[face];
 				assertTrue(failureStr + ": count of face " + face + " not within reasonably random range: " + count, 
-					90 <= count && count <= 110);
+					80 <= count && count <= 120);
 			}
 		}
 	}
