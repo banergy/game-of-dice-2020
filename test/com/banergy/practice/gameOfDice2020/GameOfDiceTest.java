@@ -191,11 +191,11 @@ public class GameOfDiceTest
 	private void _testExceptionUponInvalidScoreTarget(int scoreTarget) {
 		GameOfDice game = GameOfDice.newInstance(System.currentTimeMillis());
 		try {
-			// TODO game.setScoreTarget(scoreTarget);
+			game.setScoreTarget(scoreTarget);
 			fail();
 		}
-		catch(/*TODO GameOfDice*/Exception ex) {
-			// TODO assertEquals(ex.getMessage(), "Score target must be between 1 and " + GameOfDice.SCORE_TARGET + ". Invalid score target specified: " + scoreTarget);
+		catch(GameOfDiceException ex) {
+			assertEquals(ex.getMessage(), "Score target must be between 1 and " + GameOfDice.MAX_SCORE_TARGET + ". Invalid score target specified: " + scoreTarget);
 		}
 	}
 	

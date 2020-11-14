@@ -12,8 +12,10 @@ package com.banergy.practice.gameOfDice2020;
 public abstract class GameOfDice
 {
 	public static final int MAX_PLAYERS = 100;
+	public static final int MAX_SCORE_TARGET = 1000;
 
 	abstract public void setNumPlayers(int numPlayers);
+	abstract public void setScoreTarget(int scoreTarget);
 	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
