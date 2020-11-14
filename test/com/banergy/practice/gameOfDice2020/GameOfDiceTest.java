@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -45,9 +46,9 @@ public class GameOfDiceTest
 		boolean randomEnough = false;
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
-		for(int retries = 0; retries < 3 && !randomEnough; retries++) {
+		for(int retries = 0; retries < 5 && !randomEnough; retries++) {
 			for(int trial = 0; trial < 20; trial++) {
-				GameOfDice game = GameOfDice.newInstance(seed + retries);
+				GameOfDice game = GameOfDice.newInstance(seed + trial + retries * 20);
 				for(int roll = 0; roll < 10; roll++) {
 					int face = game.rollDice();
 					timesEachFaceAppearsPerRoll[face][roll]++;
@@ -218,19 +219,23 @@ public class GameOfDiceTest
 	
 	private void _testPlayerSequence(int numPlayers) throws InterruptedException {
 		Thread.sleep((long) (1000 * Math.random()));
-		long seed = System.currentTimeMillis();
+		long seed = System.currentTimeMillis();//1605384073173L;
+		//for(int i = 0; i < 100; i++)
+			//System.out.println(new Random(0 + i).nextInt(2));
 		String failureStr = "Failure with seed " + seed;
 		_testPlayerSequencePredictabilityBySeed(seed);
 		int[][] timesEachPlayerInEachPosition = new int[numPlayers][numPlayers];
-		for(int trial = 0; trial < numPlayers * numPlayers; trial++) {
+		for(int trial = 0; trial < numPlayers * numPlayers * 3; trial++) {
 			GameOfDice game = GameOfDice.newInstance(seed + trial);
 			game.setNumPlayers(numPlayers);
 			List<Integer> seq = game.getPlayerSequence();
+			//System.out.println(seq);
 			_testPlayerSequenceToBeValid(failureStr, numPlayers, seq);
 			for(int i = 0; i < seq.size(); i++) {
 				timesEachPlayerInEachPosition[seq.get(i)][i]++;
 			}
 		}
+		//System.out.println(Arrays.deepToString(timesEachPlayerInEachPosition));
 		boolean randomEnough = true;
 		for(int player = 0; player < numPlayers && randomEnough; player++)
 			for(int pos = 0; pos < numPlayers && randomEnough; pos++)

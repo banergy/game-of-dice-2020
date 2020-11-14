@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *
@@ -17,6 +18,7 @@ import java.util.Map;
 public class GameOfDiceImpl
 	extends GameOfDice
 {
+	private Random _random;
 	private int _numPlayers;
 	private List<Integer> _playerSequence;
 	private int _nextPlayer;
@@ -24,7 +26,8 @@ public class GameOfDiceImpl
 	private Map<Integer, Integer> _ranksByPlayer;
 	
 	protected GameOfDiceImpl(long seed) {
-		
+		_random = new Random(seed);
+		_random.nextInt();
 	}
 	
 	@Override
@@ -55,7 +58,8 @@ public class GameOfDiceImpl
 
 			// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
 			for(int i = 0; i < _numPlayers; i++) {
-				int j = i + (int) ((_numPlayers - i) * Math.random());
+				int j = i + _random.nextInt(_numPlayers - i);
+				//System.out.println("swapping " + i + "&" + j);
 				int swap = seq.get(j);
 				seq.set(j, seq.get(i));
 				seq.set(i, swap);
@@ -67,7 +71,7 @@ public class GameOfDiceImpl
 		
 	@Override
 	protected int rollDice() {
-		int face = 1 + (int) (6 * Math.random());
+		int face = 1 + _random.nextInt(6);
 		if(_playerSequence != null)
 			_scoresByPlayer.put(_nextPlayer, _scoresByPlayer.get(_nextPlayer) + face);
 		return face;
