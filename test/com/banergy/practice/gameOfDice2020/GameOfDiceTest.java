@@ -20,13 +20,18 @@ import org.junit.Test;
 public class GameOfDiceTest
 {
 	@Test
-	public void testMain() {
-		GameOfDice.main(new String[0]);
+	public void testExceptionUponInvalidNumPlayers() {
+		_testExceptionUponInvalidNumPlayer(-1);
+		_testExceptionUponInvalidNumPlayer(0);
+		_testExceptionUponInvalidNumPlayer(1);
+		_testExceptionUponInvalidNumPlayer(GameOfDice.MAX_PLAYERS + 1);
 	}
 	
 	@Test
-	public void testGames() {
-		_testGameLogic(3, 5);
+	public void testExceptionUponInvalidScoreTargets() {
+		_testExceptionUponInvalidScoreTarget(-1);
+		_testExceptionUponInvalidScoreTarget(0);
+		_testExceptionUponInvalidScoreTarget(GameOfDice.MAX_SCORE_TARGET + 1);
 	}
 	
 	@Test
@@ -102,18 +107,13 @@ public class GameOfDiceTest
 	}
 	
 	@Test
-	public void testExceptionUponInvalidNumPlayers() {
-		_testExceptionUponInvalidNumPlayer(-1);
-		_testExceptionUponInvalidNumPlayer(0);
-		_testExceptionUponInvalidNumPlayer(1);
-		_testExceptionUponInvalidNumPlayer(GameOfDice.MAX_PLAYERS + 1);
+	public void testGames() {
+		_testGameLogic(3, 5);
 	}
 	
 	@Test
-	public void testExceptionUponInvalidScoreTargets() {
-		_testExceptionUponInvalidScoreTarget(-1);
-		_testExceptionUponInvalidScoreTarget(0);
-		_testExceptionUponInvalidScoreTarget(GameOfDice.MAX_SCORE_TARGET + 1);
+	public void testMain() {
+		GameOfDice.main(new String[0]);
 	}
 	
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
