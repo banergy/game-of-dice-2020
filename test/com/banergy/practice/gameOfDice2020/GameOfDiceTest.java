@@ -36,7 +36,7 @@ public class GameOfDiceTest
 		_testPlayerSequence(8);
 		_testPlayerSequence(13);
 		_testPlayerSequence(21);
-		// TODO _testPlayerSequence(GameOfDice.MAX_PLAYERS);
+		_testPlayerSequence(GameOfDice.MAX_PLAYERS);
 	}
 	
 	@Test
@@ -92,11 +92,11 @@ public class GameOfDiceTest
 		game = GameOfDice.newInstance(seed);
 		int[] facePerRoll = new int[100];
 		for(int roll = 0; roll < 100; roll++) {
-			//TODO facePerRoll[roll] = game.rollDice();
+			facePerRoll[roll] = game.rollDice();
 		}
 		game = GameOfDice.newInstance(seed);
 		for(int roll = 0; roll < 100; roll++) {
-			//TODO assertEquals(game.rollDice(), facePerRoll[roll]);
+			assertEquals(game.rollDice(), facePerRoll[roll]);
 		}
 	}
 	
@@ -243,9 +243,9 @@ public class GameOfDiceTest
 		GameOfDice game;
 		String failureStr = "Failure with seed " + seed;
 		game = GameOfDice.newInstance(seed);
-		List<Integer> seq1 = null;//TODO game.getPlayerSequence();
+		List<Integer> seq1 = game.getPlayerSequence();
 		game = GameOfDice.newInstance(seed);
-		List<Integer> seq2 = null;//TODO game.getPlayerSequence();
+		List<Integer> seq2 = game.getPlayerSequence();
 		assertEquals(failureStr, seq1, seq2);
 	}
 	
