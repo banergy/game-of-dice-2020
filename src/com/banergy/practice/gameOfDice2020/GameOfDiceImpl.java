@@ -22,10 +22,13 @@ public class GameOfDiceImpl
 	private int _numPlayers;
 	private int _scoreTarget;
 	private List<Integer> _playerSequence;
+	boolean[] _players2bSkipped;
 	private int _iNextPlayer;
 	private Map<Integer, Integer> _scoresByPlayer;
 	private Map<Integer, Integer> _ranksByPlayer;
-	private int lastRankSoFar = 0;
+	private String _scoreAchievedMessage;
+	private String _specialRollMessage;
+	private String _rankAchievementMessage;
 	
 	protected GameOfDiceImpl(long seed) {
 		_random = new Random(seed);
@@ -42,6 +45,7 @@ public class GameOfDiceImpl
 		for(int player = 0; player < _numPlayers; player++)
 			_scoresByPlayer.put(player, 0);
 		_ranksByPlayer = new HashMap();
+		_players2bSkipped = new boolean[_numPlayers];
 	}
 	
 	@Override
@@ -74,20 +78,39 @@ public class GameOfDiceImpl
 		
 	@Override
 	protected int rollDice() {
+		_rankAchievementMessage = null;
 		int face = 1 + _random.nextInt(6);
 		if(_playerSequence != null) {
 			int nextPlayer = _playerSequence.get(_iNextPlayer);
+			String playerStr = "Player-" + (nextPlayer + 1);
 			int newScore = _scoresByPlayer.get(nextPlayer) + face;
 			_scoresByPlayer.put(nextPlayer, newScore);
+			_scoreAchievedMessage = "Achieved score points of " + face;
+			
+			_rankAchievementMessage = null;
 			if(newScore > _scoreTarget) {
-				_ranksByPlayer.put(nextPlayer, _ranksByPlayer.size() + 1);
+				int rank = _ranksByPlayer.size() + 1;
+				_ranksByPlayer.put(nextPlayer, rank);
+				_rankAchievementMessage = playerStr + " just achieved rank " + rank + '!';
 				if(_ranksByPlayer.size() == _numPlayers) {
 					_iNextPlayer = -1;
 					return face;
 				}
 			}
-			if(face != 6) {
+			_specialRollMessage = null;
+			if(face == 6) {
+				_specialRollMessage = playerStr + " got 6, so gets a chance to roll again";
+			}
+			else {
+				if(face == 1) {
+					_specialRollMessage = playerStr + " got 1, so has to skip the next turn";
+					_players2bSkipped[nextPlayer] = true;
+				}
 				_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;
+				while(_players2bSkipped[_playerSequence.get(_iNextPlayer)]) {
+					_players2bSkipped[_playerSequence.get(_iNextPlayer)] = false;
+					_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;
+				}
 			}
 		}
 		return face;
@@ -110,4 +133,18 @@ public class GameOfDiceImpl
 	protected Map<Integer, Integer> getRanksOfPlayers() {
 		return _ranksByPlayer;
 	}
+	
+	@Override
+	protected String getScoreAchievedMessage() {
+		return _scoreAchievedMessage;
+	}
+	@Override
+	protected String getRankAchievementMessage() {
+		return _rankAchievementMessage;
+	}
+	@Override
+	protected String getSpecialRollMessage() {
+		return _specialRollMessage;
+	}
+
 }

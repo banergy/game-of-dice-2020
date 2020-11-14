@@ -102,13 +102,16 @@ public class GameOfDiceTest
 		}
 		game = GameOfDice.newInstance(seed);
 		for(int roll = 0; roll < 100; roll++) {
-			assertEquals(game.rollDice(), facePerRoll[roll]);
+			assertEquals(facePerRoll[roll], game.rollDice());
 		}
 	}
 	
 	@Test
 	public void testGames() {
 		_testGameLogic(3, 5);
+		_testGameLogic(5, 8);
+		_testGameLogic(3, 13);
+		_testGameLogic(5, 21);
 	}
 	
 	@Test
@@ -117,7 +120,7 @@ public class GameOfDiceTest
 	}
 	
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
-		long seed = 1605387788337L;//System.currentTimeMillis();
+		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
 		GameOfDice game = GameOfDice.newInstance(seed);
 		game.setNumPlayers(numPlayers);
@@ -130,32 +133,32 @@ public class GameOfDiceTest
 			String playerName = "Player-" + (currentPlayer + 1);
 			String expectedMsg = playerName + ", it's your turn (press 'r' to roll the dice)";
 			//System.out.println(msg + " -vs- " + expectedMsg);
-			assertEquals(failureStr, msg, expectedMsg);
+			assertEquals(failureStr, expectedMsg, msg);
 			
 			Map<Integer, Integer> scores = new HashMap(game.getScoresOfPlayers());
 			Map<Integer, Integer> ranks = new HashMap(game.getRanksOfPlayers());
 			
 			int face = game.rollDice();
-			//TODO assertEquals(failureStr, game.getScoreAchievedMessage(), "Achieved score of " + face);
+			assertEquals(failureStr, "Achieved score points of " + face, game.getScoreAchievedMessage());
 
 			// checking correctness of score update...
 			Map<Integer, Integer> newScores = game.getScoresOfPlayers();
 			for(int player = 0; player < numPlayers; player++) {
 				if(player == currentPlayer)
-					assertEquals(failureStr, (int)(newScores.get(currentPlayer)), (int)(scores.get(currentPlayer) + face));
+					assertEquals(failureStr, (int)(scores.get(currentPlayer) + face), (int)(newScores.get(currentPlayer)));
 				else
-					assertEquals(failureStr, (int)(newScores.get(player)), (int)(scores.get(player)));
+					assertEquals(failureStr, (int)(scores.get(player)), (int)(newScores.get(player)));
 			}
 
 			// checking correctness of rank update...
 			Map<Integer, Integer> newRanks = game.getRanksOfPlayers();
 			if(newScores.get(currentPlayer) > scoreTarget) {
 				int rankAchieved = ranks.size() + 1;
-				//TODO assertEquals(failureStr, game.rankAchievementMessage(), playerName + " just achieved rank " + rankAchieved + '!');
+				assertEquals(failureStr, playerName + " just achieved rank " + rankAchieved + '!', game.getRankAchievementMessage());
 				ranks.put(currentPlayer, rankAchieved);
 			}
 			else
-				;//TODO assertNull(failureStr, game.rankAchievementMessage());
+				assertNull(failureStr, game.getRankAchievementMessage());
 			
 			assertEquals(failureStr, ranks, newRanks);
 			
@@ -168,17 +171,17 @@ public class GameOfDiceTest
 			boolean gotOne = false;
 			switch(face) {
 				case 6:
-					assertEquals(failureStr, newMsg, expectedMsg);
-					//TODO assertEquals(failureStr, game.getSpecialRollMessage(), playerName + " got 6, so gets a chance to roll again");
+					assertEquals(failureStr, expectedMsg, newMsg);
+					assertEquals(failureStr, playerName + " got 6, so gets a chance to roll again", game.getSpecialRollMessage());
 					break;
 
 				case 1:
 					player2bSkipped[currentPlayer] = true;
-					//TODO assertEquals(failureStr, game.getSpecialRollMessage(), playerName + " got 1, so has to skip the next turn");
+					assertEquals(failureStr, playerName + " got 1, so has to skip the next turn", game.getSpecialRollMessage());
 					gotOne = true;
 				default:
 					if(!gotOne)
-						;//TODO assertNull(failureStr, game.getSpecialRollMessage());
+						assertNull(failureStr, game.getSpecialRollMessage());
 					
 					iPlayer = (iPlayer + 1) % numPlayers;
 					while(player2bSkipped[seq.get(iPlayer)]) {
@@ -197,7 +200,7 @@ public class GameOfDiceTest
 			fail();
 		}
 		catch(GameOfDiceException ex) {
-			assertEquals(ex.getMessage(), "Score target must be between 1 and " + GameOfDice.MAX_SCORE_TARGET + ". Invalid score target specified: " + scoreTarget);
+			assertEquals("Score target must be between 1 and " + GameOfDice.MAX_SCORE_TARGET + ". Invalid score target specified: " + scoreTarget, ex.getMessage());
 		}
 	}
 	
@@ -254,7 +257,7 @@ public class GameOfDiceTest
 	}
 	
 	private void _testPlayerSequenceToBeValid(String failureStr, int numPlayers, List<Integer> sequence) {
-		assertEquals(failureStr, sequence.size(), numPlayers);
+		assertEquals(failureStr, numPlayers, sequence.size());
 		boolean[] encountered = new boolean[numPlayers];
 		sequence.forEach(player -> {
 			assertTrue(failureStr + ": player " + player, 0 <= player && player < numPlayers);

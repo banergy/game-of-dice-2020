@@ -22,9 +22,13 @@ public abstract class GameOfDice
 	
 	abstract protected List<Integer> getPlayerSequence();
 	abstract protected int rollDice();
+	
 	abstract protected String getNextStepMessage();
 	abstract protected Map<Integer, Integer> getScoresOfPlayers();
-	abstract protected Map<Integer, Integer> getRanksOfPlayers();
+	abstract protected Map<Integer, Integer> getRanksOfPlayers();	
+	abstract protected String getScoreAchievedMessage();
+	abstract protected String getRankAchievementMessage();
+	abstract protected String getSpecialRollMessage();
 	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
