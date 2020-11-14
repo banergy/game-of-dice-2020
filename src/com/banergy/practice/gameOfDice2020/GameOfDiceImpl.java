@@ -30,6 +30,6 @@ public class GameOfDiceImpl
 	
 	@Override
 	public int rollDice() {
-		return 0;
+		return 1 + (int) (6 * Math.random());
 	}
 }

@@ -5,6 +5,7 @@
  */
 package com.banergy.practice.gameOfDice2020;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import static org.junit.Assert.*;
@@ -39,12 +40,12 @@ public class GameOfDiceTest
 	
 	@Test
 	public void testDiceRandomness() throws InterruptedException {
-		int timesEachFaceAppearsPerRoll[][] = new int[7][100];
+		int timesEachFaceAppearsPerRoll[][] = new int[7][10];
 		boolean randomEnough = false;
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
-		for(int retries = 0; retries < 2 && !randomEnough; retries++) {
-			for(int round = 0; round < 10; round++) {
+		for(int retries = 0; retries < 3 && !randomEnough; retries++) {
+			for(int trial = 0; trial < 20; trial++) {
 				GameOfDice game = GameOfDice.newInstance(seed + retries);
 				for(int roll = 0; roll < 10; roll++) {
 					int face = game.rollDice();
@@ -56,6 +57,7 @@ public class GameOfDiceTest
 				for(int face = 1; face <= 6 && randomEnough; face++) {
 					if(timesEachFaceAppearsPerRoll[face][roll] < 1) {
 						randomEnough = false;
+						//System.out.println(Arrays.deepToString(timesEachFaceAppearsPerRoll));
 					}
 				}
 			}
