@@ -42,9 +42,11 @@ public class GameOfDiceTest
 	public void testDiceRandomness() throws InterruptedException {
 		int timesEachFaceAppearsPerRoll[][] = new int[7][100];
 		boolean randomEnough = false;
+		long seed = System.currentTimeMillis();
+		String failureStr = "Failure with seed " + seed;
 		for(int retries = 0; retries < 2 && !randomEnough; retries++) {
 			for(int round = 0; round < 10; round++) {
-				GameOfDice game = new GameOfDice();//TODO System.currentTimeMillis());
+				GameOfDice game = new GameOfDice();//TODO seed + retries);
 				for(int roll = 0; roll < 10; roll++) {
 					int face = 0;//TODO game.rollDice();
 					timesEachFaceAppearsPerRoll[face][roll]++;
@@ -58,11 +60,8 @@ public class GameOfDiceTest
 					}
 				}
 			}
-			if(!randomEnough) {
-				Thread.sleep((long) (1000 * Math.random()));
-			}
 		}
-		assertTrue(randomEnough);
+		assertTrue(failureStr, randomEnough);
 	}
 	
 	@Test
@@ -211,12 +210,43 @@ public class GameOfDiceTest
 	
 	private void _testPlayerSequence(int numPlayers) throws InterruptedException {
 		Thread.sleep((long) (1000 * Math.random()));
-		GameOfDice game = new GameOfDice();//TODO System.currentTimeMillis());
-		// TODO check for randomness
-		//TODO _testPlayerSequenceToBeValid(game.getPlayerSequence());
+		long seed = System.currentTimeMillis();
+		String failureStr = "Failure with seed " + seed;
+		_testPlayerSequencePredictabilityBySeed(seed);
+		int[][] timesEachPlayerInEachPosition = new int[numPlayers][numPlayers];
+		for(int trial = 0; trial < numPlayers * numPlayers; trial++) {
+			GameOfDice game = new GameOfDice();//TODO seed + trial);
+			List<Integer> seq = null;//TODO game.getPlayerSequence();
+			_testPlayerSequenceToBeValid(failureStr, numPlayers, seq);
+			for(int i = 0; i < seq.size(); i++) {
+				timesEachPlayerInEachPosition[seq.get(i)][i]++;
+			}
+		}
+		boolean randomEnough = true;
+		for(int player = 0; player < numPlayers && randomEnough; player++)
+			for(int pos = 0; pos < numPlayers && randomEnough; pos++)
+				if(timesEachPlayerInEachPosition[player][pos] < 1)
+					randomEnough = false;
+		assertTrue(failureStr, randomEnough);
 	}
 	
-	private void _testPlayerSequenceToBeValid(Collection<Integer> sequence) {
-		// TODO
+	private void _testPlayerSequencePredictabilityBySeed(long seed) {
+		GameOfDice game;
+		String failureStr = "Failure with seed " + seed;
+		game = new GameOfDice();//TODO seed);
+		List<Integer> seq1 = null;//TODO game.getPlayerSequence();
+		game = new GameOfDice();//TODO seed);
+		List<Integer> seq2 = null;//TODO game.getPlayerSequence();
+		assertEquals(failureStr, seq1, seq2);
+	}
+	
+	private void _testPlayerSequenceToBeValid(String failureStr, int numPlayers, List<Integer> sequence) {
+		assertEquals(failureStr, sequence.size(), numPlayers);
+		boolean[] encountered = new boolean[numPlayers];
+		sequence.forEach(player -> {
+			assertTrue(failureStr + ": player " + player, 0 <= player && player < numPlayers);
+			assertFalse(failureStr, encountered[player]);
+			encountered[player] = true;
+		});
 	}
 }
