@@ -20,10 +20,12 @@ public class GameOfDiceImpl
 {
 	private Random _random;
 	private int _numPlayers;
+	private int _scoreTarget;
 	private List<Integer> _playerSequence;
-	private int _nextPlayer;
+	private int _iNextPlayer;
 	private Map<Integer, Integer> _scoresByPlayer;
 	private Map<Integer, Integer> _ranksByPlayer;
+	private int lastRankSoFar = 0;
 	
 	protected GameOfDiceImpl(long seed) {
 		_random = new Random(seed);
@@ -36,7 +38,6 @@ public class GameOfDiceImpl
 			throw new GameOfDiceException("Number of players must between 2 and " + MAX_PLAYERS + ". Invalid number of players specified: " + numPlayers);
 		
 		_numPlayers = numPlayers;
-		_nextPlayer = getPlayerSequence().get(0);
 		_scoresByPlayer = new HashMap();
 		for(int player = 0; player < _numPlayers; player++)
 			_scoresByPlayer.put(player, 0);
@@ -47,6 +48,8 @@ public class GameOfDiceImpl
 	protected void setScoreTarget(int scoreTarget) {
 		if(scoreTarget < 2 || MAX_SCORE_TARGET < scoreTarget)
 			throw new GameOfDiceException("Score target must be between 1 and " + MAX_SCORE_TARGET + ". Invalid score target specified: " + scoreTarget);
+		
+		_scoreTarget = scoreTarget;
 	}
 	
 	@Override
@@ -72,14 +75,30 @@ public class GameOfDiceImpl
 	@Override
 	protected int rollDice() {
 		int face = 1 + _random.nextInt(6);
-		if(_playerSequence != null)
-			_scoresByPlayer.put(_nextPlayer, _scoresByPlayer.get(_nextPlayer) + face);
+		if(_playerSequence != null) {
+			int nextPlayer = _playerSequence.get(_iNextPlayer);
+			int newScore = _scoresByPlayer.get(nextPlayer) + face;
+			_scoresByPlayer.put(nextPlayer, newScore);
+			if(newScore > _scoreTarget) {
+				_ranksByPlayer.put(nextPlayer, _ranksByPlayer.size() + 1);
+				if(_ranksByPlayer.size() == _numPlayers) {
+					_iNextPlayer = -1;
+					return face;
+				}
+			}
+			if(face != 6) {
+				_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;
+			}
+		}
 		return face;
 	}
 	
 	@Override
 	protected String getNextStepMessage() {
-		return "Player-" + (_nextPlayer + 1) + ", it's your turn (press 'r' to roll the dice)";
+		if(_iNextPlayer < 0)
+			return null;
+		
+		return "Player-" + (_playerSequence.get(_iNextPlayer) + 1) + ", it's your turn (press 'r' to roll the dice)";
 	}
 	
 	@Override
