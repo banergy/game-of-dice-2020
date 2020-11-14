@@ -7,6 +7,7 @@ package com.banergy.practice.gameOfDice2020;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -41,7 +42,7 @@ public class GameOfDiceImpl
 			throw new GameOfDiceException("Number of players must between 2 and " + MAX_PLAYERS + ". Invalid number of players specified: " + numPlayers);
 		
 		_numPlayers = numPlayers;
-		_scoresByPlayer = new HashMap();
+		_scoresByPlayer = new LinkedHashMap();
 		for(int player = 0; player < _numPlayers; player++)
 			_scoresByPlayer.put(player, 0);
 		_ranksByPlayer = new HashMap();
@@ -121,7 +122,7 @@ public class GameOfDiceImpl
 		if(_iNextPlayer < 0)
 			return null;
 		
-		return "Player-" + (_playerSequence.get(_iNextPlayer) + 1) + ", it's your turn (press 'r' to roll the dice)";
+		return "Player-" + (getPlayerSequence().get(_iNextPlayer) + 1) + ", it's your turn (press 'r' to roll the dice)";
 	}
 	
 	@Override

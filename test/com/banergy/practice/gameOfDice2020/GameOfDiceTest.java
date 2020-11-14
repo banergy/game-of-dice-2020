@@ -5,6 +5,7 @@
  */
 package com.banergy.practice.gameOfDice2020;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -115,8 +116,11 @@ public class GameOfDiceTest
 	}
 	
 	@Test
-	public void testMain() {
+	public void testMain() throws IOException {
 		GameOfDice.main(new String[0]);
+		
+		//TODO enable after implementing way to access console input...
+		//GameOfDice.main(new String[]{"5", "21"});
 	}
 	
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
