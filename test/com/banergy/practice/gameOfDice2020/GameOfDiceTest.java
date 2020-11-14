@@ -75,7 +75,7 @@ public class GameOfDiceTest
 			for(int roll = 0; roll < 600; roll++) {
 				faceCounts[game.rollDice()]++;
 			}
-			System.out.println(Arrays.toString(faceCounts));
+			//System.out.println(Arrays.toString(faceCounts));
 			for(int face = 1; face <= 6; face++) {
 				int count = faceCounts[face];
 				assertTrue(failureStr + ": count of face " + face + " not within reasonably random range: " + count, 
@@ -111,21 +111,23 @@ public class GameOfDiceTest
 	public void testExceptionUponInvalidScoreTargets() {
 		_testExceptionUponInvalidScoreTarget(-1);
 		_testExceptionUponInvalidScoreTarget(0);
-		// TODO _testExceptionUponInvalidScoreTarget(GameOfDice.MAX_SCORE_TARGET + 1);
+		_testExceptionUponInvalidScoreTarget(GameOfDice.MAX_SCORE_TARGET + 1);
 	}
 	
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
 		GameOfDice game = GameOfDice.newInstance(seed);
-		// TODO game.setNumPlayers(numPlayers);
-		// TODO game.setScoreTarget(scoreTarget);
-		List<Integer> seq = null;//TODO game.getPlayerSequence();
+		game.setNumPlayers(numPlayers);
+		game.setScoreTarget(scoreTarget);
+		List<Integer> seq = game.getPlayerSequence();
 		boolean player2bSkipped[] = new boolean[numPlayers];
-		for(int currentPlayer = 0; ;) {
-			String msg = null;//TODO game.getNextStepMessage();
-			String playerName = "Player-" + seq.get(currentPlayer + 1);
+		for(int iPlayer = 0; ;) {
+			int currentPlayer = seq.get(iPlayer);
+			String msg = game.getNextStepMessage();
+			String playerName = "Player-" + (currentPlayer + 1);
 			String expectedMsg = playerName + ", it's your turn (press 'r' to roll the dice)";
+			//System.out.println(msg + " -vs- " + expectedMsg);
 			assertEquals(failureStr, msg, expectedMsg);
 			
 			Map<Integer, Integer> scores = null;//TODO new HashMap(game.getScoresOfPlayers());
@@ -181,10 +183,10 @@ public class GameOfDiceTest
 					if(!gotOne)
 						;//TODO assertNull(failureStr, game.getSpecialRollMessage());
 					
-					currentPlayer = (currentPlayer + 1) % numPlayers;
-					while(player2bSkipped[currentPlayer]) {
-						player2bSkipped[currentPlayer] = false;
-						currentPlayer = (currentPlayer + 1) % numPlayers;
+					iPlayer = (iPlayer + 1) % numPlayers;
+					while(player2bSkipped[seq.get(iPlayer)]) {
+						player2bSkipped[seq.get(iPlayer)] = false;
+						iPlayer = (iPlayer + 1) % numPlayers;
 					}
 					break;
 			}

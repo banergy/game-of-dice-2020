@@ -21,6 +21,7 @@ public abstract class GameOfDice
 	
 	abstract protected List<Integer> getPlayerSequence();
 	abstract protected int rollDice();
+	abstract protected String getNextStepMessage();
 	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
