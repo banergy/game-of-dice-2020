@@ -5,7 +5,6 @@
  */
 package com.banergy.practice.gameOfDice2020;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import static org.junit.Assert.*;
@@ -66,7 +65,9 @@ public class GameOfDiceTest
 	
 	@Test
 	public void testDiceNormalDistribution() {
-		GameOfDice game = new GameOfDice();//TODO System.currentTimeMillis());
+		long seed = System.currentTimeMillis();
+		String failureStr = "Failure with seed " + seed;
+		GameOfDice game = new GameOfDice();//TODO seed);
 		int[] faceCounts = new int[7];
 		for(int pass = 0; pass < 5; pass++) {
 			for(int roll = 0; roll < 600; roll++) {
@@ -74,8 +75,8 @@ public class GameOfDiceTest
 			}
 			for(int face = 1; face <= 6; face++) {
 				int count = faceCounts[face];
-				assertTrue("Count of face " + face + " not within reasonably random range: " + count, 
-					90 <= count || count <= 110);
+				assertTrue(failureStr + ": count of face " + face + " not within reasonably random range: " + count, 
+					90 <= count && count <= 110);
 			}
 		}
 	}
@@ -191,6 +192,7 @@ public class GameOfDiceTest
 		GameOfDice game = new GameOfDice();//TODO System.currentTimeMillis());
 		try {
 			// TODO game.setScoreTarget(scoreTarget);
+			fail();
 		}
 		catch(/*TODO GameOfDice*/Exception ex) {
 			// TODO assertEquals(ex.getMessage(), "Score target must be between 1 and " + GameOfDice.SCORE_TARGET + ". Invalid score target specified: " + scoreTarget);
