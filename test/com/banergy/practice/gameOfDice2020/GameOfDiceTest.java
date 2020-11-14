@@ -226,9 +226,13 @@ public class GameOfDiceTest
 			List<Integer> seq = game.getPlayerSequence();
 			//System.out.println(seq);
 			_testPlayerSequenceToBeValid(failureStr, numPlayers, seq);
+			
 			for(int i = 0; i < seq.size(); i++) {
 				timesEachPlayerInEachPosition[seq.get(i)][i]++;
 			}
+			
+			List<Integer> seqAgain = game.getPlayerSequence();
+			assertEquals(failureStr, seq, seqAgain);
 		}
 		//System.out.println(Arrays.deepToString(timesEachPlayerInEachPosition));
 		int unvisitedCount = 0;
