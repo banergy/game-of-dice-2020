@@ -70,7 +70,7 @@ public class GameOfDiceTest
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
 		GameOfDice game = GameOfDice.newInstance(seed);
-		for(int pass = 0; pass < 5; pass++) {
+		for(int pass = 0; pass < 2; pass++) {
 			int[] faceCounts = new int[7];
 			for(int roll = 0; roll < 600; roll++) {
 				faceCounts[game.rollDice()]++;
@@ -221,7 +221,8 @@ public class GameOfDiceTest
 		int[][] timesEachPlayerInEachPosition = new int[numPlayers][numPlayers];
 		for(int trial = 0; trial < numPlayers * numPlayers; trial++) {
 			GameOfDice game = GameOfDice.newInstance(seed + trial);
-			List<Integer> seq = null;//TODO game.getPlayerSequence();
+			game.setNumPlayers(numPlayers);
+			List<Integer> seq = game.getPlayerSequence();
 			_testPlayerSequenceToBeValid(failureStr, numPlayers, seq);
 			for(int i = 0; i < seq.size(); i++) {
 				timesEachPlayerInEachPosition[seq.get(i)][i]++;

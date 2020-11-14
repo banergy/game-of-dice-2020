@@ -5,6 +5,8 @@
  */
 package com.banergy.practice.gameOfDice2020;
 
+import java.util.List;
+
 /**
  *
  * @author user
@@ -14,10 +16,11 @@ public abstract class GameOfDice
 	public static final int MAX_PLAYERS = 100;
 	public static final int MAX_SCORE_TARGET = 1000;
 
-	abstract public void setNumPlayers(int numPlayers);
-	abstract public void setScoreTarget(int scoreTarget);
+	abstract protected void setNumPlayers(int numPlayers);
+	abstract protected void setScoreTarget(int scoreTarget);
 	
-	abstract public int rollDice();
+	abstract protected List<Integer> getPlayerSequence();
+	abstract protected int rollDice();
 	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
