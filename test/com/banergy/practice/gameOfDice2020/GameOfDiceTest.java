@@ -45,7 +45,7 @@ public class GameOfDiceTest
 		String failureStr = "Failure with seed " + seed;
 		for(int retries = 0; retries < 2 && !randomEnough; retries++) {
 			for(int round = 0; round < 10; round++) {
-				GameOfDice game = new GameOfDice();//TODO seed + retries);
+				GameOfDice game = GameOfDice.newInstance(seed + retries);
 				for(int roll = 0; roll < 10; roll++) {
 					int face = 0;//TODO game.rollDice();
 					timesEachFaceAppearsPerRoll[face][roll]++;
@@ -67,7 +67,7 @@ public class GameOfDiceTest
 	public void testDiceNormalDistribution() {
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
-		GameOfDice game = new GameOfDice();//TODO seed);
+		GameOfDice game = GameOfDice.newInstance(seed);
 		int[] faceCounts = new int[7];
 		for(int pass = 0; pass < 5; pass++) {
 			for(int roll = 0; roll < 600; roll++) {
@@ -83,14 +83,14 @@ public class GameOfDiceTest
 	
 	@Test
 	public void testDicePredictabilityBySeed() {
-		long millis = System.currentTimeMillis();
+		long seed = System.currentTimeMillis();
 		GameOfDice game;
-		game = new GameOfDice();//TODO millis);
+		game = GameOfDice.newInstance(seed);
 		int[] facePerRoll = new int[100];
 		for(int roll = 0; roll < 100; roll++) {
 			//TODO facePerRoll[roll] = game.rollDice();
 		}
-		game = new GameOfDice();//TODO millis);
+		game = GameOfDice.newInstance(seed);
 		for(int roll = 0; roll < 100; roll++) {
 			//TODO assertEquals(game.rollDice(), facePerRoll[roll]);
 		}
@@ -101,7 +101,7 @@ public class GameOfDiceTest
 		_testExceptionUponInvalidNumPlayer(-1);
 		_testExceptionUponInvalidNumPlayer(0);
 		_testExceptionUponInvalidNumPlayer(1);
-		// TODO _testExceptionUponInvalidNumPlayer(GameOfDice.MAX_PLAYERS + 1);
+		_testExceptionUponInvalidNumPlayer(GameOfDice.MAX_PLAYERS + 1);
 	}
 	
 	@Test
@@ -114,7 +114,7 @@ public class GameOfDiceTest
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
 		long seed = System.currentTimeMillis();
 		String failureStr = "Failure with seed " + seed;
-		GameOfDice game = new GameOfDice();//seed;
+		GameOfDice game = GameOfDice.newInstance(seed);
 		// TODO game.setNumPlayers(numPlayers);
 		// TODO game.setScoreTarget(scoreTarget);
 		List<Integer> seq = null;//TODO game.getPlayerSequence();
@@ -189,7 +189,7 @@ public class GameOfDiceTest
 	}
 	
 	private void _testExceptionUponInvalidScoreTarget(int scoreTarget) {
-		GameOfDice game = new GameOfDice();//TODO System.currentTimeMillis());
+		GameOfDice game = GameOfDice.newInstance(System.currentTimeMillis());
 		try {
 			// TODO game.setScoreTarget(scoreTarget);
 			fail();
@@ -200,13 +200,13 @@ public class GameOfDiceTest
 	}
 	
 	private void _testExceptionUponInvalidNumPlayer(int num) {
-		GameOfDice game = new GameOfDice();//TODO System.currentTimeMillis());
+		GameOfDice game = GameOfDice.newInstance(System.currentTimeMillis());
 		try {
-			// TODO game.setNumPlayers(num);
+			game.setNumPlayers(num);
 			fail();
 		}
-		catch(/*TODO GameOfDice*/Exception ex) {
-			// TODO assertEquals(ex.getMessage(), "Number of players must between 2 and " + GameOfDice.MAX_PLAYERS + ". Invalid number of players specified: " + num);
+		catch(GameOfDiceException ex) {
+			assertEquals(ex.getMessage(), "Number of players must between 2 and " + GameOfDice.MAX_PLAYERS + ". Invalid number of players specified: " + num);
 		}
 	}
 	
@@ -217,7 +217,7 @@ public class GameOfDiceTest
 		_testPlayerSequencePredictabilityBySeed(seed);
 		int[][] timesEachPlayerInEachPosition = new int[numPlayers][numPlayers];
 		for(int trial = 0; trial < numPlayers * numPlayers; trial++) {
-			GameOfDice game = new GameOfDice();//TODO seed + trial);
+			GameOfDice game = GameOfDice.newInstance(seed + trial);
 			List<Integer> seq = null;//TODO game.getPlayerSequence();
 			_testPlayerSequenceToBeValid(failureStr, numPlayers, seq);
 			for(int i = 0; i < seq.size(); i++) {
@@ -235,9 +235,9 @@ public class GameOfDiceTest
 	private void _testPlayerSequencePredictabilityBySeed(long seed) {
 		GameOfDice game;
 		String failureStr = "Failure with seed " + seed;
-		game = new GameOfDice();//TODO seed);
+		game = GameOfDice.newInstance(seed);
 		List<Integer> seq1 = null;//TODO game.getPlayerSequence();
-		game = new GameOfDice();//TODO seed);
+		game = GameOfDice.newInstance(seed);
 		List<Integer> seq2 = null;//TODO game.getPlayerSequence();
 		assertEquals(failureStr, seq1, seq2);
 	}
