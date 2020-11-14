@@ -6,6 +6,7 @@
 package com.banergy.practice.gameOfDice2020;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static org.junit.Assert.*;
@@ -72,14 +73,14 @@ public class GameOfDiceTest
 		GameOfDice game = GameOfDice.newInstance(seed);
 		for(int pass = 0; pass < 2; pass++) {
 			int[] faceCounts = new int[7];
-			for(int roll = 0; roll < 600; roll++) {
+			for(int roll = 0; roll < 6000; roll++) {
 				faceCounts[game.rollDice()]++;
 			}
 			//System.out.println(Arrays.toString(faceCounts));
 			for(int face = 1; face <= 6; face++) {
 				int count = faceCounts[face];
 				assertTrue(failureStr + ": count of face " + face + " not within reasonably random range: " + count, 
-					80 <= count && count <= 120);
+					800 <= count && count <= 1200);
 			}
 		}
 	}
@@ -130,14 +131,14 @@ public class GameOfDiceTest
 			//System.out.println(msg + " -vs- " + expectedMsg);
 			assertEquals(failureStr, msg, expectedMsg);
 			
-			Map<Integer, Integer> scores = null;//TODO new HashMap(game.getScoresOfPlayers());
-			Map<Integer, Integer> ranks = null;//TODO new HashMap(game.getRanksOfPlayers());
+			Map<Integer, Integer> scores = new HashMap(game.getScoresOfPlayers());
+			Map<Integer, Integer> ranks = new HashMap(game.getRanksOfPlayers());
 			
-			int face = 0;//TODO game.rollDice();
+			int face = game.rollDice();
 			//TODO assertEquals(failureStr, game.getScoreAchievedMessage(), "Achieved score of " + face);
 
 			// checking correctness of score update...
-			Map<Integer, Integer> newScores = null;//TODO game.getScoresOfPlayers();
+			Map<Integer, Integer> newScores = game.getScoresOfPlayers();
 			for(int player = 0; player < numPlayers; player++) {
 				if(player == currentPlayer)
 					assertEquals(failureStr, (int)(newScores.get(currentPlayer)), (int)(scores.get(currentPlayer) + face));
@@ -146,7 +147,7 @@ public class GameOfDiceTest
 			}
 
 			// checking correctness of rank update...
-			Map<Integer, Integer> newRanks = null;//TODO game.getRanksOfPlayers();
+			Map<Integer, Integer> newRanks = game.getRanksOfPlayers();
 			if(newScores.get(currentPlayer) > scoreTarget) {
 				int lastRankSoFar = 0;
 				for(int player: ranks.keySet())

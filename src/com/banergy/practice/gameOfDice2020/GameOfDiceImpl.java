@@ -6,8 +6,9 @@
 package com.banergy.practice.gameOfDice2020;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -19,6 +20,8 @@ public class GameOfDiceImpl
 	private int _numPlayers;
 	private List<Integer> _playerSequence;
 	private int _nextPlayer;
+	private Map<Integer, Integer> _scoresByPlayer;
+	private Map<Integer, Integer> _ranksByPlayer;
 	
 	protected GameOfDiceImpl(long seed) {
 		
@@ -31,6 +34,10 @@ public class GameOfDiceImpl
 		
 		_numPlayers = numPlayers;
 		_nextPlayer = getPlayerSequence().get(0);
+		_scoresByPlayer = new HashMap();
+		for(int player = 0; player < _numPlayers; player++)
+			_scoresByPlayer.put(player, 0);
+		_ranksByPlayer = new HashMap();
 	}
 	
 	@Override
@@ -60,11 +67,24 @@ public class GameOfDiceImpl
 		
 	@Override
 	protected int rollDice() {
-		return 1 + (int) (6 * Math.random());
+		int face = 1 + (int) (6 * Math.random());
+		if(_playerSequence != null)
+			_scoresByPlayer.put(_nextPlayer, _scoresByPlayer.get(_nextPlayer) + face);
+		return face;
 	}
 	
 	@Override
 	protected String getNextStepMessage() {
 		return "Player-" + (_nextPlayer + 1) + ", it's your turn (press 'r' to roll the dice)";
+	}
+	
+	@Override
+	protected Map<Integer, Integer> getScoresOfPlayers() {
+		return _scoresByPlayer;
+	}
+	
+	@Override
+	protected Map<Integer, Integer> getRanksOfPlayers() {
+		return _ranksByPlayer;
 	}
 }

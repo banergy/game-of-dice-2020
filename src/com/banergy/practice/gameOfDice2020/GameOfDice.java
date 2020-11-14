@@ -6,6 +6,7 @@
 package com.banergy.practice.gameOfDice2020;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -22,6 +23,8 @@ public abstract class GameOfDice
 	abstract protected List<Integer> getPlayerSequence();
 	abstract protected int rollDice();
 	abstract protected String getNextStepMessage();
+	abstract protected Map<Integer, Integer> getScoresOfPlayers();
+	abstract protected Map<Integer, Integer> getRanksOfPlayers();
 	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
