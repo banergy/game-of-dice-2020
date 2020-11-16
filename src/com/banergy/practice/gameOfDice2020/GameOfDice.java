@@ -6,8 +6,10 @@
 package com.banergy.practice.gameOfDice2020;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  *
@@ -17,6 +19,8 @@ public abstract class GameOfDice
 {
 	public static final int MAX_PLAYERS = 100;
 	public static final int MAX_SCORE_TARGET = 1000;
+	
+	private static InputStream sInteractionInputStream = System.in;
 
 	abstract protected void setNumPlayers(int numPlayers);
 	abstract protected void setScoreTarget(int scoreTarget);
@@ -30,6 +34,10 @@ public abstract class GameOfDice
 	abstract protected String getScoreAchievedMessage();
 	abstract protected String getRankAchievementMessage();
 	abstract protected String getSpecialRollMessage();
+	
+	protected static void setInteractionInputStream(InputStream in) {
+		sInteractionInputStream = in;
+	}
 	
 	public static GameOfDice newInstance(long seed) {
 		return new GameOfDiceImpl(seed);
@@ -47,17 +55,22 @@ public abstract class GameOfDice
 		}
 		// TODO try abstracting the interaction out
 		// TODO display scores & ranks in a single table
-		GameOfDice game = GameOfDice.newInstance(System.currentTimeMillis());
+		long seed = System.currentTimeMillis();
+		GameOfDice game = GameOfDice.newInstance(seed);
+		System.out.println("Initialized game, with seed " + seed + '.');
 		game.setNumPlayers(Integer.valueOf(args[0]));
 		game.setScoreTarget(Integer.valueOf(args[1]));
-		for(;;) {
+		for(Scanner in = new Scanner(sInteractionInputStream); ;) {
 			String nextStepMessage = game.getNextStepMessage();
 			if(nextStepMessage == null)
 				break;
 			
 			System.out.println(nextStepMessage);
-			System.console().readLine();
-			
+			String s = in.nextLine();
+			if("q".equals(s))
+				break;
+
+			game.rollDice();
 			System.out.println(game.getScoreAchievedMessage());
 			
 			String specialRollMessage = game.getSpecialRollMessage();
@@ -68,17 +81,18 @@ public abstract class GameOfDice
 			if(rankAchievementMessage != null)
 				System.out.println(rankAchievementMessage);
 			
-			System.out.println("Current Scores:");
+			System.out.println("\nCurrent Scores:");
 			Map<Integer, Integer> scores = game.getScoresOfPlayers();
 			scores.keySet().forEach(player -> {
 				System.out.println("Player-" + (player + 1) + " = " + scores.get(player));
 			});
 			
-			System.out.println("Current Rankings:");
+			System.out.println("\nCurrent Rankings:");
 			Map<Integer, Integer> ranks = game.getRanksOfPlayers();
 			ranks.keySet().forEach(player -> {
 				System.out.println("Player-" + (player + 1) + " = " + ranks.get(player));
 			});
+			System.out.println();
 		}
 		System.out.println("End Game!");
 	}

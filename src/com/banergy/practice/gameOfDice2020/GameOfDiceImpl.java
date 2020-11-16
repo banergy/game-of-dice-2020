@@ -99,18 +99,37 @@ public class GameOfDiceImpl
 				}
 			}
 			_specialRollMessage = null;
-			if(face == 6) {
-				_specialRollMessage = playerStr + " got 6, so gets a chance to roll again";
-			}
-			else {
-				if(face == 1) {
+			boolean needIncrementPlayer;
+			switch(face)
+			{
+				case 6:
+					if(_rankAchievementMessage != null) {
+						needIncrementPlayer = true;
+					}
+					else {
+						_specialRollMessage = playerStr + " got 6, so gets a chance to roll again";
+						needIncrementPlayer = false;
+					}
+					break;
+			
+				case 1:
 					_specialRollMessage = playerStr + " got 1, so has to skip the next turn";
 					_players2bSkipped[nextPlayer] = true;
-				}
+				default:
+					needIncrementPlayer = true;
+					break;
+			}
+			while(needIncrementPlayer) {
 				_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;
-				while(_players2bSkipped[_playerSequence.get(_iNextPlayer)]) {
-					_players2bSkipped[_playerSequence.get(_iNextPlayer)] = false;
-					_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;
+				needIncrementPlayer = false;
+
+				nextPlayer = _playerSequence.get(_iNextPlayer);
+				if(_ranksByPlayer.containsKey(nextPlayer)) {
+					needIncrementPlayer = true;
+				}
+				else if(_players2bSkipped[nextPlayer]) {
+					_players2bSkipped[nextPlayer] = false;
+					needIncrementPlayer = true;
 				}
 			}
 		}

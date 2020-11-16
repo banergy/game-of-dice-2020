@@ -5,6 +5,7 @@
  */
 package com.banergy.practice.gameOfDice2020;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,8 +120,20 @@ public class GameOfDiceTest
 	public void testMain() throws IOException {
 		GameOfDice.main(new String[0]);
 		
-		//TODO enable after implementing way to access console input...
-		//GameOfDice.main(new String[]{"5", "21"});
+		StringBuilder sb = new StringBuilder(1024);
+		for(int i = 0; i < 1024; i++) {
+			sb.append("r\n");
+		}
+		byte[] inbytes = sb.toString().getBytes();
+
+		GameOfDice.setInteractionInputStream(new ByteArrayInputStream(inbytes));
+		GameOfDice.main(new String[]{"2", "6"});
+
+		GameOfDice.setInteractionInputStream(new ByteArrayInputStream(inbytes));
+		GameOfDice.main(new String[]{"5", "21"});
+
+		GameOfDice.setInteractionInputStream(new ByteArrayInputStream(inbytes));
+		GameOfDice.main(new String[]{"9", "30"});
 	}
 	
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
@@ -156,13 +169,16 @@ public class GameOfDiceTest
 
 			// checking correctness of rank update...
 			Map<Integer, Integer> newRanks = game.getRanksOfPlayers();
+			final int rankAchieved;
 			if(newScores.get(currentPlayer) > scoreTarget) {
-				int rankAchieved = ranks.size() + 1;
+				rankAchieved = ranks.size() + 1;
 				assertEquals(failureStr, playerName + " just achieved rank " + rankAchieved + '!', game.getRankAchievementMessage());
 				ranks.put(currentPlayer, rankAchieved);
 			}
-			else
+			else {
 				assertNull(failureStr, game.getRankAchievementMessage());
+				rankAchieved = 0;
+			}
 			
 			assertEquals(failureStr, ranks, newRanks);
 			
@@ -172,27 +188,43 @@ public class GameOfDiceTest
 				assertNull(newMsg);
 				break;
 			}
-			boolean gotOne = false;
+			boolean needIncrementPlayer;
 			switch(face) {
 				case 6:
-					assertEquals(failureStr, expectedMsg, newMsg);
-					assertEquals(failureStr, playerName + " got 6, so gets a chance to roll again", game.getSpecialRollMessage());
+					if(rankAchieved > 0) {
+						needIncrementPlayer = true;
+						assertNull(failureStr, game.getSpecialRollMessage());
+					}
+					else {
+						assertEquals(failureStr, expectedMsg, newMsg);
+						assertEquals(failureStr, playerName + " got 6, so gets a chance to roll again", game.getSpecialRollMessage());
+						needIncrementPlayer = false;
+						break;
+					}
 					break;
 
 				case 1:
 					player2bSkipped[currentPlayer] = true;
 					assertEquals(failureStr, playerName + " got 1, so has to skip the next turn", game.getSpecialRollMessage());
-					gotOne = true;
-				default:
-					if(!gotOne)
-						assertNull(failureStr, game.getSpecialRollMessage());
-					
-					iPlayer = (iPlayer + 1) % numPlayers;
-					while(player2bSkipped[seq.get(iPlayer)]) {
-						player2bSkipped[seq.get(iPlayer)] = false;
-						iPlayer = (iPlayer + 1) % numPlayers;
-					}
+					needIncrementPlayer = true;
 					break;
+					
+				default:
+					assertNull(failureStr, game.getSpecialRollMessage());
+					needIncrementPlayer = true;
+					break;
+			}
+			while(needIncrementPlayer) {
+				iPlayer = (iPlayer + 1) % numPlayers;
+				needIncrementPlayer = false;
+
+				if(ranks.containsKey(seq.get(iPlayer))) {
+					needIncrementPlayer = true;
+				}
+				else if(player2bSkipped[seq.get(iPlayer)]) {
+					player2bSkipped[seq.get(iPlayer)] = false;
+					needIncrementPlayer = true;
+				}
 			}
 		}
 	}
