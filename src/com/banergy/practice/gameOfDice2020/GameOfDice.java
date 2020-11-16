@@ -62,14 +62,17 @@ public abstract class GameOfDice
 		game.setScoreTarget(Integer.valueOf(args[1]));
 		for(Scanner in = new Scanner(sInteractionInputStream); ;) {
 			String nextStepMessage = game.getNextStepMessage();
-			if(nextStepMessage == null)
+			if(nextStepMessage == null) {
+				System.out.println("End Game!");
 				break;
+			}
 			
 			System.out.println(nextStepMessage);
 			String s = in.nextLine();
-			if("q".equals(s))
+			if("q".equals(s)) {
+				System.out.println("Game aborted!");
 				break;
-
+			}
 			game.rollDice();
 			System.out.println(game.getScoreAchievedMessage());
 			
@@ -94,6 +97,5 @@ public abstract class GameOfDice
 			});
 			System.out.println();
 		}
-		System.out.println("End Game!");
 	}
 }

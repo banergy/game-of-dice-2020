@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GameOfDice.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;GreatLearning2020&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">com.banergy.practice.gameOfDice2020</a> &gt; <span class="el_source">GameOfDice.java</span></div><h1>GameOfDice.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.banergy.practice.gameOfDice2020;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+/**
+ *
+ * @author user
+ */
+<span class="fc" id="L18">public abstract class GameOfDice</span>
+{
+	public static final int MAX_PLAYERS = 100;
+	public static final int MAX_SCORE_TARGET = 1000;
+	
+<span class="fc" id="L23">	private static InputStream sInteractionInputStream = System.in;</span>
+
+	abstract protected void setNumPlayers(int numPlayers);
+	abstract protected void setScoreTarget(int scoreTarget);
+	
+	abstract protected List&lt;Integer&gt; getPlayerSequence();
+	abstract protected int rollDice();
+	
+	abstract protected String getNextStepMessage();
+	abstract protected Map&lt;Integer, Integer&gt; getScoresOfPlayers();
+	abstract protected Map&lt;Integer, Integer&gt; getRanksOfPlayers();	
+	abstract protected String getScoreAchievedMessage();
+	abstract protected String getRankAchievementMessage();
+	abstract protected String getSpecialRollMessage();
+	
+	protected static void setInteractionInputStream(InputStream in) {
+<span class="fc" id="L39">		sInteractionInputStream = in;</span>
+<span class="fc" id="L40">	}</span>
+	
+	public static GameOfDice newInstance(long seed) {
+<span class="fc" id="L43">		return new GameOfDiceImpl(seed);</span>
+	}
+
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String[] args) throws IOException
+	{
+		// TODO test/coverage for error handling
+<span class="fc bfc" id="L52" title="All 2 branches covered.">		if(args.length &lt; 2) {</span>
+<span class="fc" id="L53">			System.out.println(&quot;USAGE: GameOfDice &lt;number-of-players&gt; &lt;target-score&gt;&quot;);</span>
+<span class="fc" id="L54">			return;</span>
+		}
+		// TODO try abstracting the interaction out
+		// TODO display scores &amp; ranks in a single table
+<span class="fc" id="L58">		long seed = System.currentTimeMillis();</span>
+<span class="fc" id="L59">		GameOfDice game = GameOfDice.newInstance(seed);</span>
+<span class="fc" id="L60">		System.out.println(&quot;Initialized game, with seed &quot; + seed + '.');</span>
+<span class="fc" id="L61">		game.setNumPlayers(Integer.valueOf(args[0]));</span>
+<span class="fc" id="L62">		game.setScoreTarget(Integer.valueOf(args[1]));</span>
+<span class="fc" id="L63">		for(Scanner in = new Scanner(sInteractionInputStream); ;) {</span>
+<span class="fc" id="L64">			String nextStepMessage = game.getNextStepMessage();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">			if(nextStepMessage == null) {</span>
+<span class="fc" id="L66">				System.out.println(&quot;End Game!&quot;);</span>
+<span class="fc" id="L67">				break;</span>
+			}
+			
+<span class="fc" id="L70">			System.out.println(nextStepMessage);</span>
+<span class="fc" id="L71">			String s = in.nextLine();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">			if(&quot;q&quot;.equals(s)) {</span>
+<span class="fc" id="L73">				System.out.println(&quot;Game aborted!&quot;);</span>
+<span class="fc" id="L74">				break;</span>
+			}
+<span class="fc" id="L76">			game.rollDice();</span>
+<span class="fc" id="L77">			System.out.println(game.getScoreAchievedMessage());</span>
+			
+<span class="fc" id="L79">			String specialRollMessage = game.getSpecialRollMessage();</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">			if(specialRollMessage != null)</span>
+<span class="fc" id="L81">				System.out.println(specialRollMessage);</span>
+			
+<span class="fc" id="L83">			String rankAchievementMessage = game.getRankAchievementMessage();</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">			if(rankAchievementMessage != null)</span>
+<span class="fc" id="L85">				System.out.println(rankAchievementMessage);</span>
+			
+<span class="fc" id="L87">			System.out.println(&quot;\nCurrent Scores:&quot;);</span>
+<span class="fc" id="L88">			Map&lt;Integer, Integer&gt; scores = game.getScoresOfPlayers();</span>
+<span class="fc" id="L89">			scores.keySet().forEach(player -&gt; {</span>
+<span class="fc" id="L90">				System.out.println(&quot;Player-&quot; + (player + 1) + &quot; = &quot; + scores.get(player));</span>
+<span class="fc" id="L91">			});</span>
+			
+<span class="fc" id="L93">			System.out.println(&quot;\nCurrent Rankings:&quot;);</span>
+<span class="fc" id="L94">			Map&lt;Integer, Integer&gt; ranks = game.getRanksOfPlayers();</span>
+<span class="fc" id="L95">			ranks.keySet().forEach(player -&gt; {</span>
+<span class="fc" id="L96">				System.out.println(&quot;Player-&quot; + (player + 1) + &quot; = &quot; + ranks.get(player));</span>
+<span class="fc" id="L97">			});</span>
+<span class="fc" id="L98">			System.out.println();</span>
+<span class="fc" id="L99">		}</span>
+<span class="fc" id="L100">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -117,9 +117,12 @@ public class GameOfDiceTest
 	}
 	
 	@Test
-	public void testMain() throws IOException {
+	public void runMainWithDefaultWithoutArgs() throws IOException {
 		GameOfDice.main(new String[0]);
-		
+	}
+	
+	@Test
+	public void runMainWithValidGames() throws IOException {
 		StringBuilder sb = new StringBuilder(1024);
 		for(int i = 0; i < 1024; i++) {
 			sb.append("r\n");
@@ -134,6 +137,12 @@ public class GameOfDiceTest
 
 		GameOfDice.setInteractionInputStream(new ByteArrayInputStream(inbytes));
 		GameOfDice.main(new String[]{"9", "30"});
+	}
+	
+	@Test
+	public void runMainWithQuitCommand() throws IOException {
+		GameOfDice.setInteractionInputStream(new ByteArrayInputStream("r\nq\n".getBytes()));
+		GameOfDice.main(new String[]{"2", "6"});
 	}
 	
 	private void _testGameLogic(int numPlayers, int scoreTarget, int... randomNumbers) {
