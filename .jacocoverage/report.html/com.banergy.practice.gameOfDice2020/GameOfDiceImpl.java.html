@@ -23,7 +23,7 @@ public class GameOfDiceImpl
 	private int _numPlayers;
 	private int _scoreTarget;
 	private List&lt;Integer&gt; _playerSequence;
-	boolean[] _players2bSkipped;
+	int[] _consecutiveOnesByPlayer;
 	private int _iNextPlayer;
 	private Map&lt;Integer, Integer&gt; _scoresByPlayer;
 	private Map&lt;Integer, Integer&gt; _ranksByPlayer;
@@ -46,7 +46,7 @@ public class GameOfDiceImpl
 <span class="fc bfc" id="L46" title="All 2 branches covered.">		for(int player = 0; player &lt; _numPlayers; player++)</span>
 <span class="fc" id="L47">			_scoresByPlayer.put(player, 0);</span>
 <span class="fc" id="L48">		_ranksByPlayer = new HashMap();</span>
-<span class="fc" id="L49">		_players2bSkipped = new boolean[_numPlayers];</span>
+<span class="fc" id="L49">		_consecutiveOnesByPlayer = new int[_numPlayers];</span>
 <span class="fc" id="L50">	}</span>
 	
 	@Override
@@ -100,71 +100,78 @@ public class GameOfDiceImpl
 			}
 <span class="fc" id="L101">			_specialRollMessage = null;</span>
 			boolean needIncrementPlayer;
-<span class="fc bfc" id="L103" title="All 3 branches covered.">			switch(face)</span>
+<span class="fc" id="L103">			boolean gotOne = false;</span>
+<span class="fc bfc" id="L104" title="All 3 branches covered.">			switch(face)</span>
 			{
 				case 6:
-<span class="fc bfc" id="L106" title="All 2 branches covered.">					if(_rankAchievementMessage != null) {</span>
-<span class="fc" id="L107">						needIncrementPlayer = true;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">					if(_rankAchievementMessage != null) {</span>
+<span class="fc" id="L108">						needIncrementPlayer = true;</span>
 					}
 					else {
-<span class="fc" id="L110">						_specialRollMessage = playerStr + &quot; got 6, so gets a chance to roll again&quot;;</span>
-<span class="fc" id="L111">						needIncrementPlayer = false;</span>
+<span class="fc" id="L111">						_specialRollMessage = playerStr + &quot; got 6, so gets a chance to roll again&quot;;</span>
+<span class="fc" id="L112">						needIncrementPlayer = false;</span>
 					}
-<span class="fc" id="L113">					break;</span>
+<span class="fc" id="L114">					break;</span>
 			
 				case 1:
-<span class="fc" id="L116">					_specialRollMessage = playerStr + &quot; got 1, so has to skip the next turn&quot;;</span>
-<span class="fc" id="L117">					_players2bSkipped[nextPlayer] = true;</span>
+<span class="fc" id="L117">					gotOne = true;</span>
+<span class="fc" id="L118">					_consecutiveOnesByPlayer[nextPlayer]++;</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">					if(_consecutiveOnesByPlayer[nextPlayer] &gt; 1) {</span>
+<span class="fc" id="L120">						_specialRollMessage = playerStr + &quot; got 1 twice in a row, so has to skip the next turn&quot;;</span>
+					}
 				default:
-<span class="fc" id="L119">					needIncrementPlayer = true;</span>
+<span class="fc" id="L123">					needIncrementPlayer = true;</span>
 					break;
 			}
-<span class="fc bfc" id="L122" title="All 2 branches covered.">			while(needIncrementPlayer) {</span>
-<span class="fc" id="L123">				_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;</span>
-<span class="fc" id="L124">				needIncrementPlayer = false;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">			if(!gotOne) {</span>
+<span class="fc" id="L127">				_consecutiveOnesByPlayer[nextPlayer] = 0;</span>
+			}
+<span class="fc bfc" id="L129" title="All 2 branches covered.">			while(needIncrementPlayer) {</span>
+<span class="fc" id="L130">				_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;</span>
+<span class="fc" id="L131">				needIncrementPlayer = false;</span>
 
-<span class="fc" id="L126">				nextPlayer = _playerSequence.get(_iNextPlayer);</span>
-<span class="fc bfc" id="L127" title="All 2 branches covered.">				if(_ranksByPlayer.containsKey(nextPlayer)) {</span>
-<span class="fc" id="L128">					needIncrementPlayer = true;</span>
+<span class="fc" id="L133">				nextPlayer = _playerSequence.get(_iNextPlayer);</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">				if(_ranksByPlayer.containsKey(nextPlayer)) {</span>
+<span class="fc" id="L135">					needIncrementPlayer = true;</span>
 				}
-<span class="fc bfc" id="L130" title="All 2 branches covered.">				else if(_players2bSkipped[nextPlayer]) {</span>
-<span class="fc" id="L131">					_players2bSkipped[nextPlayer] = false;</span>
-<span class="fc" id="L132">					needIncrementPlayer = true;</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">				else if(_consecutiveOnesByPlayer[nextPlayer] &gt; 1) {</span>
+<span class="fc" id="L138">					_consecutiveOnesByPlayer[nextPlayer] = 0;</span>
+<span class="fc" id="L139">					needIncrementPlayer = true;</span>
 				}
 			}
 		}
-<span class="fc" id="L136">		return face;</span>
+<span class="fc" id="L143">		return face;</span>
 	}
 	
 	@Override
 	protected String getNextStepMessage() {
-<span class="fc bfc" id="L141" title="All 2 branches covered.">		if(_iNextPlayer &lt; 0)</span>
-<span class="fc" id="L142">			return null;</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">		if(_iNextPlayer &lt; 0)</span>
+<span class="fc" id="L149">			return null;</span>
 		
-<span class="fc" id="L144">		return &quot;Player-&quot; + (getPlayerSequence().get(_iNextPlayer) + 1) + &quot;, it's your turn (press 'r' to roll the dice)&quot;;</span>
+<span class="fc" id="L151">		return &quot;Player-&quot; + (getPlayerSequence().get(_iNextPlayer) + 1) + &quot;, it's your turn (press 'r' to roll the dice)&quot;;</span>
 	}
 	
 	@Override
 	protected Map&lt;Integer, Integer&gt; getScoresOfPlayers() {
-<span class="fc" id="L149">		return _scoresByPlayer;</span>
+<span class="fc" id="L156">		return _scoresByPlayer;</span>
 	}
 	
 	@Override
 	protected Map&lt;Integer, Integer&gt; getRanksOfPlayers() {
-<span class="fc" id="L154">		return _ranksByPlayer;</span>
+<span class="fc" id="L161">		return _ranksByPlayer;</span>
 	}
 	
 	@Override
 	protected String getScoreAchievedMessage() {
-<span class="fc" id="L159">		return _scoreAchievedMessage;</span>
+<span class="fc" id="L166">		return _scoreAchievedMessage;</span>
 	}
 	@Override
 	protected String getRankAchievementMessage() {
-<span class="fc" id="L163">		return _rankAchievementMessage;</span>
+<span class="fc" id="L170">		return _rankAchievementMessage;</span>
 	}
 	@Override
 	protected String getSpecialRollMessage() {
-<span class="fc" id="L167">		return _specialRollMessage;</span>
+<span class="fc" id="L174">		return _specialRollMessage;</span>
 	}
 
 }

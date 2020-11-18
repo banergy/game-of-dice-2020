@@ -23,7 +23,7 @@ public class GameOfDiceImpl
 	private int _numPlayers;
 	private int _scoreTarget;
 	private List<Integer> _playerSequence;
-	boolean[] _players2bSkipped;
+	int[] _consecutiveOnesByPlayer;
 	private int _iNextPlayer;
 	private Map<Integer, Integer> _scoresByPlayer;
 	private Map<Integer, Integer> _ranksByPlayer;
@@ -46,7 +46,7 @@ public class GameOfDiceImpl
 		for(int player = 0; player < _numPlayers; player++)
 			_scoresByPlayer.put(player, 0);
 		_ranksByPlayer = new HashMap();
-		_players2bSkipped = new boolean[_numPlayers];
+		_consecutiveOnesByPlayer = new int[_numPlayers];
 	}
 	
 	@Override
@@ -100,6 +100,7 @@ public class GameOfDiceImpl
 			}
 			_specialRollMessage = null;
 			boolean needIncrementPlayer;
+			boolean gotOne = false;
 			switch(face)
 			{
 				case 6:
@@ -113,11 +114,17 @@ public class GameOfDiceImpl
 					break;
 			
 				case 1:
-					_specialRollMessage = playerStr + " got 1, so has to skip the next turn";
-					_players2bSkipped[nextPlayer] = true;
+					gotOne = true;
+					_consecutiveOnesByPlayer[nextPlayer]++;
+					if(_consecutiveOnesByPlayer[nextPlayer] > 1) {
+						_specialRollMessage = playerStr + " got 1 twice in a row, so has to skip the next turn";
+					}
 				default:
 					needIncrementPlayer = true;
 					break;
+			}
+			if(!gotOne) {
+				_consecutiveOnesByPlayer[nextPlayer] = 0;
 			}
 			while(needIncrementPlayer) {
 				_iNextPlayer = (_iNextPlayer + 1) % _numPlayers;
@@ -127,8 +134,8 @@ public class GameOfDiceImpl
 				if(_ranksByPlayer.containsKey(nextPlayer)) {
 					needIncrementPlayer = true;
 				}
-				else if(_players2bSkipped[nextPlayer]) {
-					_players2bSkipped[nextPlayer] = false;
+				else if(_consecutiveOnesByPlayer[nextPlayer] > 1) {
+					_consecutiveOnesByPlayer[nextPlayer] = 0;
 					needIncrementPlayer = true;
 				}
 			}

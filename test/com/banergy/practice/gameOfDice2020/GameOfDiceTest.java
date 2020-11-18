@@ -152,7 +152,7 @@ public class GameOfDiceTest
 		game.setNumPlayers(numPlayers);
 		game.setScoreTarget(scoreTarget);
 		List<Integer> seq = game.getPlayerSequence();
-		boolean player2bSkipped[] = new boolean[numPlayers];
+		int consecutiveOnesByPlayer[] = new int[numPlayers];
 		for(int iPlayer = 0; ;) {
 			int currentPlayer = seq.get(iPlayer);
 			String msg = game.getNextStepMessage();
@@ -181,7 +181,8 @@ public class GameOfDiceTest
 			final int rankAchieved;
 			if(newScores.get(currentPlayer) > scoreTarget) {
 				rankAchieved = ranks.size() + 1;
-				assertEquals(failureStr, playerName + " just achieved rank " + rankAchieved + '!', game.getRankAchievementMessage());
+				assertEquals(failureStr, playerName + " just achieved rank " + rankAchieved + '!', 
+					game.getRankAchievementMessage());
 				ranks.put(currentPlayer, rankAchieved);
 			}
 			else {
@@ -198,6 +199,7 @@ public class GameOfDiceTest
 				break;
 			}
 			boolean needIncrementPlayer;
+			boolean gotOne = false;
 			switch(face) {
 				case 6:
 					if(rankAchieved > 0) {
@@ -206,15 +208,20 @@ public class GameOfDiceTest
 					}
 					else {
 						assertEquals(failureStr, expectedMsg, newMsg);
-						assertEquals(failureStr, playerName + " got 6, so gets a chance to roll again", game.getSpecialRollMessage());
+						assertEquals(failureStr, playerName + " got 6, so gets a chance to roll again", 
+							game.getSpecialRollMessage());
 						needIncrementPlayer = false;
 						break;
 					}
 					break;
 
 				case 1:
-					player2bSkipped[currentPlayer] = true;
-					assertEquals(failureStr, playerName + " got 1, so has to skip the next turn", game.getSpecialRollMessage());
+					gotOne = true;
+					consecutiveOnesByPlayer[currentPlayer]++;
+					if(consecutiveOnesByPlayer[currentPlayer] > 1) {
+						assertEquals(failureStr, playerName + " got 1 twice in a row, so has to skip the next turn", 
+							game.getSpecialRollMessage());
+					}
 					needIncrementPlayer = true;
 					break;
 					
@@ -223,6 +230,9 @@ public class GameOfDiceTest
 					needIncrementPlayer = true;
 					break;
 			}
+			if(!gotOne) {
+				consecutiveOnesByPlayer[currentPlayer] = 0;
+			}
 			while(needIncrementPlayer) {
 				iPlayer = (iPlayer + 1) % numPlayers;
 				needIncrementPlayer = false;
@@ -230,8 +240,8 @@ public class GameOfDiceTest
 				if(ranks.containsKey(seq.get(iPlayer))) {
 					needIncrementPlayer = true;
 				}
-				else if(player2bSkipped[seq.get(iPlayer)]) {
-					player2bSkipped[seq.get(iPlayer)] = false;
+				else if(consecutiveOnesByPlayer[seq.get(iPlayer)] > 1) {
+					consecutiveOnesByPlayer[seq.get(iPlayer)] = 0;
 					needIncrementPlayer = true;
 				}
 			}
